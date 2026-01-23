@@ -1,0 +1,8 @@
+{
+  "video_path": "data/raw/soccerchallenge2025/117092.mp4",
+  "checkpoint_path": "/workspace/soccer_coach_cv/models/checkpoints/latest_checkpoint.pth",
+  "frames_processed": 100,
+  "total_detections": 10000,
+  "avg_detections_per_frame": 100.0,
+  "confidence_threshold": 0.0
+}

@@ -1,0 +1,8 @@
+{
+  "video_path": "/workspace/soccer_coach_cv/data/raw/SoccerTrack_sub/videos/117093_panorama_1st_half-017.mp4",
+  "checkpoint_path": "/workspace/soccer_coach_cv/models/checkpoints/latest_checkpoint.pth",
+  "frames_processed": 10,
+  "total_detections": 0,
+  "avg_detections_per_frame": 0.0,
+  "confidence_threshold": 0.1
+}
