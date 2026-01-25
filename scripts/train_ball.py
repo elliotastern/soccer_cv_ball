@@ -405,7 +405,7 @@ def load_config(config_path: str) -> Dict:
 
 def prepare_dataset(config: Dict, force_convert: bool = False) -> Tuple[str, str]:
     """
-    Prepare COCO format dataset from YOLO format, optionally merging with Validation images OFFICIAL.
+    Prepare COCO format dataset from YOLO or Pascal VOC format, optionally merging with Validation images OFFICIAL.
     
     Args:
         config: Configuration dictionary
@@ -415,11 +415,89 @@ def prepare_dataset(config: Dict, force_convert: bool = False) -> Tuple[str, str
         Tuple of (train_dir, val_dir) paths
     """
     dataset_config = config['dataset']
-    ball_class_id = dataset_config['ball_class_id']
     category_name = dataset_config['category_name']
     category_id = dataset_config['category_id']
     
     use_combined = dataset_config.get('use_combined_dataset', False)
+    
+    # Check if VOC format is specified
+    voc_train_path = dataset_config.get('voc_train_path')
+    voc_train_annotations = dataset_config.get('voc_train_annotations')
+    voc_train_images = dataset_config.get('voc_train_images')
+    voc_val_path = dataset_config.get('voc_val_path')
+    voc_val_annotations = dataset_config.get('voc_val_annotations')
+    voc_val_images = dataset_config.get('voc_val_images')
+    
+    is_voc_format = voc_train_path is not None
+    
+    if is_voc_format:
+        # Pascal VOC format conversion
+        coco_train_path = Path(dataset_config['coco_train_path'])
+        coco_val_path = Path(dataset_config.get('coco_val_path', ''))
+        
+        # Import VOC converter
+        sys.path.insert(0, str(Path(__file__).parent))
+        from voc_to_coco import convert_voc_to_coco_ball_only
+        
+        # Convert training set
+        if force_convert or not check_coco_dataset_exists(coco_train_path):
+            print(f"\n📦 Converting Open Soccer Ball Dataset train from Pascal VOC to COCO format...")
+            print(f"   Annotations: {voc_train_annotations}")
+            print(f"   Images: {voc_train_images}")
+            print(f"   Destination: {coco_train_path}")
+            
+            if not Path(voc_train_annotations).exists():
+                raise FileNotFoundError(f"VOC train annotations directory not found: {voc_train_annotations}")
+            if not Path(voc_train_images).exists():
+                raise FileNotFoundError(f"VOC train images directory not found: {voc_train_images}")
+            
+            train_images, train_annos = convert_voc_to_coco_ball_only(
+                voc_dir=Path(voc_train_path),
+                annotations_dir=Path(voc_train_annotations),
+                images_dir=Path(voc_train_images),
+                output_dir=coco_train_path,
+                split_name="train",
+                category_name=category_name,
+                category_id=category_id
+            )
+            
+            if train_images == 0:
+                raise ValueError(f"No ball annotations found in train dataset")
+        else:
+            print(f"\n✅ Open Soccer Ball Dataset train COCO dataset already exists: {coco_train_path}")
+        
+        # Convert validation set
+        if voc_val_path and voc_val_annotations and voc_val_images:
+            if force_convert or not check_coco_dataset_exists(coco_val_path):
+                print(f"\n📦 Converting Open Soccer Ball Dataset validation from Pascal VOC to COCO format...")
+                print(f"   Annotations: {voc_val_annotations}")
+                print(f"   Images: {voc_val_images}")
+                print(f"   Destination: {coco_val_path}")
+                
+                if not Path(voc_val_annotations).exists():
+                    raise FileNotFoundError(f"VOC val annotations directory not found: {voc_val_annotations}")
+                if not Path(voc_val_images).exists():
+                    raise FileNotFoundError(f"VOC val images directory not found: {voc_val_images}")
+                
+                val_images, val_annos = convert_voc_to_coco_ball_only(
+                    voc_dir=Path(voc_val_path),
+                    annotations_dir=Path(voc_val_annotations),
+                    images_dir=Path(voc_val_images),
+                    output_dir=coco_val_path,
+                    split_name="valid",
+                    category_name=category_name,
+                    category_id=category_id
+                )
+                
+                if val_images == 0:
+                    print(f"⚠️  Warning: No ball annotations found in validation dataset")
+            else:
+                print(f"✅ Open Soccer Ball Dataset validation COCO dataset already exists: {coco_val_path}")
+        
+        return str(coco_train_path), str(coco_val_path) if coco_val_path else str(coco_train_path)
+    
+    # YOLO format conversion (existing code)
+    ball_class_id = dataset_config['ball_class_id']
     
     yolo_train_path = Path(dataset_config['yolo_train_path'])
     yolo_val_path = Path(dataset_config.get('yolo_val_path', ''))
@@ -607,8 +685,17 @@ def main():
     
     # Apply Mosaic augmentation if enabled
     augmentation_config = config.get('augmentation', {})
-    mosaic_config = augmentation_config.get('mosaic', {})
-    if mosaic_config.get('enabled', False):
+    # Handle both old format (dict with 'enabled') and new format (direct value)
+    mosaic_value = augmentation_config.get('mosaic', 0)
+    if isinstance(mosaic_value, dict):
+        mosaic_config = mosaic_value
+        mosaic_enabled = mosaic_config.get('enabled', False)
+    else:
+        # New format: mosaic is a float (probability)
+        mosaic_enabled = mosaic_value > 0
+        mosaic_config = {'enabled': True, 'prob': float(mosaic_value)} if mosaic_enabled else {}
+    
+    if mosaic_enabled:
         print("\n" + "="*60)
         print("MOSAIC AUGMENTATION")
         print("="*60)
@@ -711,12 +798,12 @@ def main():
         training_config = config['training']
     output_config = config.get('output', {})
     
-    output_dir = args.output_dir or output_config.get('output_dir', 'models/ball_detection')
+    output_dir = Path(args.output_dir or output_config.get('output_dir', 'models/ball_detection'))
     os.makedirs(output_dir, exist_ok=True)
     
     # Prepare dataset directory structure for RF-DETR
     # RF-DETR expects: dataset_dir/train/, dataset_dir/valid/, and dataset_dir/test/
-    dataset_base = Path(output_dir) / "dataset"
+    dataset_base = output_dir / "dataset"
     train_dataset_dir = dataset_base / "train"
     valid_dataset_dir = dataset_base / "valid"
     test_dataset_dir = dataset_base / "test"
@@ -870,11 +957,20 @@ def main():
         # Check for existing checkpoint to resume from
         checkpoint_files = list(Path(output_dir).glob("*.pth"))
         start_epoch = 0
+        latest_checkpoint_path = None
         if checkpoint_files:
-            latest_checkpoint = max(checkpoint_files, key=lambda p: p.stat().st_mtime)
+            # Prefer checkpoint.pth (main checkpoint) over best checkpoints
+            main_checkpoint = Path(output_dir) / "checkpoint.pth"
+            if main_checkpoint.exists():
+                checkpoint_to_check = main_checkpoint
+            else:
+                # Fall back to latest by modification time
+                checkpoint_to_check = max(checkpoint_files, key=lambda p: p.stat().st_mtime)
+            
+            latest_checkpoint_path = str(checkpoint_to_check)
             try:
                 import torch
-                checkpoint = torch.load(str(latest_checkpoint), map_location='cpu', weights_only=False)
+                checkpoint = torch.load(str(checkpoint_to_check), map_location='cpu', weights_only=False)
                 if 'epoch' in checkpoint:
                     start_epoch = checkpoint['epoch'] + 1
                     print(f"📁 Found checkpoint from epoch {checkpoint['epoch']}")
@@ -885,103 +981,152 @@ def main():
                 print(f"⚠️  Could not load checkpoint info: {e}")
                 print(f"   Starting from epoch 0")
         
-        # Track last checkpoint to detect new ones
-        last_checkpoint_time = 0
-        checkpoint_files_before = set(Path(output_dir).glob("*.pth"))
+        # RF-DETR's train() method is designed to train all epochs in one call
+        # It handles checkpointing and resuming internally
+        # We'll call it once with all remaining epochs
+        print(f"\n{'='*60}")
+        print(f"STARTING TRAINING")
+        print(f"{'='*60}")
+        if start_epoch > 0:
+            print(f"📁 Resuming from epoch {start_epoch}")
+            print(f"🔄 Training epochs {start_epoch + 1} to {num_epochs} ({num_epochs - start_epoch} epochs)")
+        else:
+            print(f"🆕 Starting fresh training for {num_epochs} epochs")
         
-        for epoch in range(start_epoch, num_epochs):
-            print(f"\n{'='*60}")
-            print(f"EPOCH {epoch + 1}/{num_epochs}")
-            print(f"{'='*60}")
-            
-            # Train for 1 epoch (catch RF-DETR evaluation bug)
+        # Determine checkpoint to resume from
+        resume_checkpoint = None
+        if start_epoch > 0 and latest_checkpoint_path:
+            # Prefer checkpoint.pth (main checkpoint) for resuming
+            main_checkpoint = output_dir / "checkpoint.pth"
+            if main_checkpoint.exists():
+                resume_checkpoint = str(main_checkpoint)
+            else:
+                resume_checkpoint = latest_checkpoint_path
+            print(f"📁 Resuming from: {Path(resume_checkpoint).name}")
+        
+        # WORKAROUND: RF-DETR's resume parameter has a bug with model weight loading
+        # Manually load checkpoint weights to ensure they're loaded correctly
+        # Note: We still pass the resume parameter to RF-DETR so it knows the epoch number
+        # and can load optimizer/LR scheduler state
+        if resume_checkpoint and start_epoch > 0:
+            print(f"\n⚠️  Using workaround for RF-DETR resume bug...")
+            print(f"   Manually loading model weights from checkpoint (resume parameter will still be used for epoch/optimizer state)")
             try:
-                model.train(
-                    dataset_dir=str(dataset_base),
-                    epochs=1,  # Train one epoch at a time
-                    batch_size=training_config['batch_size'],
-                    grad_accum_steps=training_config['grad_accum_steps'],
-                    lr=training_config['learning_rate'],
-                    output_dir=output_dir,
-                    resolution=training_config.get('resolution', 1288),
-                    device=training_config.get('device', 'cuda'),
-                    num_workers=training_config.get('num_workers', 4)
-                )
-            except TypeError as e:
-                # RF-DETR has a known bug in evaluation code (non-critical)
-                if "only 0-dimensional arrays" in str(e):
-                    print(f"⚠️  RF-DETR evaluation bug encountered (non-critical): {e}")
-                    print("   Training completed, but evaluation had an error. Continuing...")
+                import torch
+                checkpoint = torch.load(resume_checkpoint, map_location='cpu', weights_only=False)
+                
+                # RF-DETR model structure: model.model.model is the actual PyTorch model
+                # Path: RFDETRBase -> Model -> LWDETR (PyTorch nn.Module)
+                if 'model' in checkpoint:
+                    model_state = checkpoint['model']
+                    if hasattr(model, 'model') and hasattr(model.model, 'model'):
+                        # Filter out keys that might have size mismatches
+                        current_model_state = model.model.model.state_dict()
+                        filtered_state = {}
+                        skipped_keys = []
+                        
+                        for key, value in model_state.items():
+                            if key in current_model_state:
+                                if current_model_state[key].shape == value.shape:
+                                    filtered_state[key] = value
+                                else:
+                                    skipped_keys.append(key)
+                            else:
+                                skipped_keys.append(key)
+                        
+                        # Load filtered state dict
+                        missing_keys, unexpected_keys = model.model.model.load_state_dict(filtered_state, strict=False)
+                        if skipped_keys:
+                            print(f"   ⚠️  Skipped {len(skipped_keys)} keys due to size mismatch")
+                        if missing_keys:
+                            print(f"   ⚠️  {len(missing_keys)} missing keys")
+                        if unexpected_keys:
+                            print(f"   ⚠️  {len(unexpected_keys)} unexpected keys")
+                        print(f"   ✅ Model weights loaded ({len(filtered_state)}/{len(model_state)} layers)")
+                        print(f"   ✅ Checkpoint loaded manually (epoch {checkpoint.get('epoch', 'N/A')})")
+                        # Keep resume_checkpoint set so RF-DETR can use it for epoch/optimizer/scheduler state
+                    else:
+                        print(f"   ❌ Could not find model.model.model to load weights")
+                        raise AttributeError("Model structure not as expected")
                 else:
-                    raise
+                    print(f"   ❌ No 'model' key in checkpoint")
+                    raise KeyError("No 'model' key in checkpoint")
+            except Exception as e:
+                print(f"   ❌ Error loading checkpoint manually: {e}")
+                print(f"   Falling back to RF-DETR resume (may fail due to bug)")
+                import traceback
+                traceback.print_exc()
+        
+        # Train all remaining epochs in one call
+        # RF-DETR will handle the training loop internally
+        try:
+            # Convert paths to strings for RF-DETR (it may do internal Path operations)
+            # IMPORTANT: RF-DETR expects 'epochs' to be the TOTAL number of epochs, not remaining
+            # RF-DETR will automatically start from start_epoch (set from checkpoint) and train until epochs
+            # So if we want to train to epoch 20, we pass epochs=20, and RF-DETR starts from checkpoint epoch
+            train_kwargs = {
+                'dataset_dir': str(dataset_base.absolute()),
+                'epochs': num_epochs,  # Pass TOTAL epochs - RF-DETR will start from checkpoint epoch automatically
+                'batch_size': training_config['batch_size'],
+                'grad_accum_steps': training_config['grad_accum_steps'],
+                'lr': training_config['learning_rate'],
+                'output_dir': str(Path(output_dir).absolute()),
+                'resolution': training_config.get('resolution', 1288),
+                'device': training_config.get('device', 'cuda'),
+                'num_workers': training_config.get('num_workers', 4)
+            }
             
-            # Check for new checkpoint
-            checkpoint_files_after = set(Path(output_dir).glob("*.pth"))
-            new_checkpoints = checkpoint_files_after - checkpoint_files_before
-            if new_checkpoints:
-                checkpoint_files_before = checkpoint_files_after
-                print(f"✅ New checkpoint created")
+            # Add resume parameter if we have a checkpoint
+            # This tells RF-DETR the starting epoch and loads optimizer/LR scheduler state
+            # (Model weights were already loaded manually above as a workaround for the bug)
+            # Use absolute path to avoid path resolution issues
+            if resume_checkpoint:
+                train_kwargs['resume'] = str(Path(resume_checkpoint).absolute())
             
-            # Log basic progress metrics to MLflow (even if evaluation fails)
-            if mlflow_run:
-                try:
-                    mlflow.log_metric('epoch', epoch + 1, step=epoch + 1)
-                    mlflow.log_metric('checkpoint_saved', 1 if new_checkpoints else 0, step=epoch + 1)
-                except Exception as e:
-                    print(f"⚠️  Warning: Failed to log basic metrics to MLflow: {e}")
+            print(f"\n🚀 Starting RF-DETR training...")
+            print(f"   Dataset dir: {train_kwargs['dataset_dir']}")
+            print(f"   Output dir: {train_kwargs['output_dir']}")
+            print(f"   Total epochs: {num_epochs}")
+            if resume_checkpoint:
+                print(f"   Resume from: {train_kwargs['resume']} (epoch {start_epoch})")
+                print(f"   Will train epochs {start_epoch + 1} to {num_epochs}")
+            else:
+                print(f"   Continuing from manually loaded checkpoint (epoch {start_epoch})")
+                print(f"   Will train epochs {start_epoch + 1} to {num_epochs}")
+            model.train(**train_kwargs)
+            print(f"\n✅ RF-DETR training completed!")
             
-            # Evaluate after each epoch (or based on frequency)
-            if (epoch + 1) % eval_frequency == 0:
-                try:
-                    print(f"\n{'='*60}")
-                    print(f"EVALUATION (Epoch {epoch + 1})")
-                    print(f"{'='*60}")
-                    
-                    # Use training dataset for evaluation (has ground truth)
-                    from scripts.evaluate_ball_model import evaluate_on_training_dataset, load_model
-                    
-                    # Load latest checkpoint
-                    checkpoint_path = None
-                    checkpoint_files = list(Path(output_dir).glob("*.pth"))
-                    if checkpoint_files:
-                        checkpoint_path = str(max(checkpoint_files, key=lambda p: p.stat().st_mtime))
-                    
-                    eval_model = load_model(checkpoint_path)
-                    
-                    # Evaluate on training dataset (subset of images)
-                    num_eval_images = eval_config.get('num_eval_images', 100)
-                    eval_metrics = evaluate_on_training_dataset(
-                        eval_model,
-                        train_dataset_dir,
-                        num_images=num_eval_images,
-                        confidence_threshold=0.3
-                    )
-                    
-                    print(f"\n📊 Evaluation Results (Epoch {epoch + 1}):")
-                    print(f"  Ball Recall: {eval_metrics['ball_recall']:.4f}")
-                    print(f"  Ball Precision: {eval_metrics['ball_precision']:.4f}")
-                    print(f"  Center Distance: {eval_metrics['ball_center_distance']:.2f} pixels")
-                    print(f"  Avg Detections/Frame: {eval_metrics['avg_detections_per_frame']:.2f}")
-                    
-                    # Log to MLflow
-                    if mlflow_run:
-                        try:
-                            mlflow.log_metrics({
-                                'ball_recall': eval_metrics['ball_recall'],
-                                'ball_precision': eval_metrics['ball_precision'],
-                                'ball_center_distance': eval_metrics['ball_center_distance'],
-                                'avg_detections_per_frame': eval_metrics['avg_detections_per_frame']
-                            }, step=epoch + 1)
-                            print("✅ Metrics logged to MLflow")
-                        except Exception as e:
-                            print(f"⚠️  Warning: Failed to log metrics to MLflow: {e}")
-                except Exception as eval_error:
-                    print(f"⚠️  Evaluation failed (non-critical): {eval_error}")
-                    print("   Training will continue to next epoch...")
-                    import traceback
-                    traceback.print_exc()
+        except (TypeError, Exception) as e:
+            # RF-DETR has a known bug in evaluation code (non-critical)
+            if "only 0-dimensional arrays" in str(e):
+                print(f"⚠️  RF-DETR evaluation bug encountered (non-critical): {e}")
+                print("   Training completed, but evaluation had an error.")
+            else:
+                print(f"❌ Error during training: {e}")
+                import traceback
+                traceback.print_exc()
+                raise
+        
+        # Note: The per-epoch evaluation loop below is now skipped
+        # RF-DETR handles evaluation internally during training
+        # If you need custom evaluation, it can be done after training completes
+        
+        # Training completed - RF-DETR handled all epochs internally
         print("\n✅ Training completed successfully!")
         print(f"📁 Model saved to: {output_dir}")
+        
+        # Final checkpoint summary
+        final_checkpoints = list(Path(output_dir).glob("*.pth"))
+        if final_checkpoints:
+            print(f"\n📦 Final checkpoints:")
+            for cp in sorted(final_checkpoints, key=lambda p: p.stat().st_mtime, reverse=True)[:5]:
+                try:
+                    import torch
+                    ckpt = torch.load(str(cp), map_location='cpu', weights_only=False)
+                    epoch = ckpt.get('epoch', 'unknown')
+                    print(f"  {cp.name}: Epoch {epoch}")
+                except:
+                    print(f"  {cp.name}")
         
     except Exception as e:
         print(f"\n❌ Training failed: {e}")

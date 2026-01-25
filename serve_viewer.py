@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 Simple HTTP server to view annotations
-Run this and open http://localhost:8000/view_annotations.html in your browser
+Run this and open http://localhost:8001/view_annotations.html in your browser
 """
 import http.server
 import socketserver
@@ -9,7 +9,7 @@ import os
 import json
 from pathlib import Path
 
-PORT = 8000
+PORT = 8001
 
 class MyHTTPRequestHandler(http.server.SimpleHTTPRequestHandler):
     def end_headers(self):

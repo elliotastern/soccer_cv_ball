@@ -1,0 +1,208 @@
+Collecting rfdetr
+  Downloading rfdetr-1.4.0.post0-py3-none-any.whl.metadata (22 kB)
+Collecting pycocotools (from rfdetr)
+  Downloading pycocotools-2.0.11-cp311-cp311-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl.metadata (1.3 kB)
+Requirement already satisfied: torch<=2.8.0,>=1.13.0 in /usr/local/lib/python3.11/dist-packages (from rfdetr) (2.4.1+cu124)
+Requirement already satisfied: torchvision>=0.14.0 in /usr/local/lib/python3.11/dist-packages (from rfdetr) (0.19.1+cu124)
+Collecting scipy (from rfdetr)
+  Downloading scipy-1.17.0-cp311-cp311-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl.metadata (62 kB)
+Collecting tqdm (from rfdetr)
+  Downloading tqdm-4.67.1-py3-none-any.whl.metadata (57 kB)
+Requirement already satisfied: numpy in /usr/local/lib/python3.11/dist-packages (from rfdetr) (1.26.3)
+Collecting transformers (from rfdetr)
+  Downloading transformers-4.57.6-py3-none-any.whl.metadata (43 kB)
+Collecting peft (from rfdetr)
+  Downloading peft-0.18.1-py3-none-any.whl.metadata (14 kB)
+Collecting polygraphy (from rfdetr)
+  Downloading polygraphy-0.49.26-py2.py3-none-any.whl.metadata (5.8 kB)
+Collecting rf100vl (from rfdetr)
+  Downloading rf100vl-1.1.0-py3-none-any.whl.metadata (8.3 kB)
+Collecting pydantic (from rfdetr)
+  Downloading pydantic-2.12.5-py3-none-any.whl.metadata (90 kB)
+Collecting supervision (from rfdetr)
+  Downloading supervision-0.27.0-py3-none-any.whl.metadata (13 kB)
+Collecting matplotlib (from rfdetr)
+  Downloading matplotlib-3.10.8-cp311-cp311-manylinux2014_x86_64.manylinux_2_17_x86_64.whl.metadata (52 kB)
+Collecting roboflow (from rfdetr)
+  Downloading roboflow-1.2.13-py3-none-any.whl.metadata (9.7 kB)
+Collecting pillow-avif-plugin<1.5.3 (from rfdetr)
+  Downloading pillow_avif_plugin-1.5.2-cp311-cp311-manylinux_2_28_x86_64.whl.metadata (2.1 kB)
+Requirement already satisfied: filelock in /usr/local/lib/python3.11/dist-packages (from torch<=2.8.0,>=1.13.0->rfdetr) (3.13.1)
+Requirement already satisfied: typing-extensions>=4.8.0 in /usr/local/lib/python3.11/dist-packages (from torch<=2.8.0,>=1.13.0->rfdetr) (4.9.0)
+Requirement already satisfied: sympy in /usr/local/lib/python3.11/dist-packages (from torch<=2.8.0,>=1.13.0->rfdetr) (1.12)
+Requirement already satisfied: networkx in /usr/local/lib/python3.11/dist-packages (from torch<=2.8.0,>=1.13.0->rfdetr) (3.2.1)
+Requirement already satisfied: jinja2 in /usr/local/lib/python3.11/dist-packages (from torch<=2.8.0,>=1.13.0->rfdetr) (3.1.3)
+Requirement already satisfied: fsspec in /usr/local/lib/python3.11/dist-packages (from torch<=2.8.0,>=1.13.0->rfdetr) (2024.2.0)
+Requirement already satisfied: nvidia-cuda-nvrtc-cu12==12.4.99 in /usr/local/lib/python3.11/dist-packages (from torch<=2.8.0,>=1.13.0->rfdetr) (12.4.99)
+Requirement already satisfied: nvidia-cuda-runtime-cu12==12.4.99 in /usr/local/lib/python3.11/dist-packages (from torch<=2.8.0,>=1.13.0->rfdetr) (12.4.99)
+Requirement already satisfied: nvidia-cuda-cupti-cu12==12.4.99 in /usr/local/lib/python3.11/dist-packages (from torch<=2.8.0,>=1.13.0->rfdetr) (12.4.99)
+Requirement already satisfied: nvidia-cudnn-cu12==9.1.0.70 in /usr/local/lib/python3.11/dist-packages (from torch<=2.8.0,>=1.13.0->rfdetr) (9.1.0.70)
+Requirement already satisfied: nvidia-cublas-cu12==12.4.2.65 in /usr/local/lib/python3.11/dist-packages (from torch<=2.8.0,>=1.13.0->rfdetr) (12.4.2.65)
+Requirement already satisfied: nvidia-cufft-cu12==11.2.0.44 in /usr/local/lib/python3.11/dist-packages (from torch<=2.8.0,>=1.13.0->rfdetr) (11.2.0.44)
+Requirement already satisfied: nvidia-curand-cu12==10.3.5.119 in /usr/local/lib/python3.11/dist-packages (from torch<=2.8.0,>=1.13.0->rfdetr) (10.3.5.119)
+Requirement already satisfied: nvidia-cusolver-cu12==11.6.0.99 in /usr/local/lib/python3.11/dist-packages (from torch<=2.8.0,>=1.13.0->rfdetr) (11.6.0.99)
+Requirement already satisfied: nvidia-cusparse-cu12==12.3.0.142 in /usr/local/lib/python3.11/dist-packages (from torch<=2.8.0,>=1.13.0->rfdetr) (12.3.0.142)
+Requirement already satisfied: nvidia-nccl-cu12==2.20.5 in /usr/local/lib/python3.11/dist-packages (from torch<=2.8.0,>=1.13.0->rfdetr) (2.20.5)
+Requirement already satisfied: nvidia-nvtx-cu12==12.4.99 in /usr/local/lib/python3.11/dist-packages (from torch<=2.8.0,>=1.13.0->rfdetr) (12.4.99)
+Requirement already satisfied: nvidia-nvjitlink-cu12==12.4.99 in /usr/local/lib/python3.11/dist-packages (from torch<=2.8.0,>=1.13.0->rfdetr) (12.4.99)
+Requirement already satisfied: triton==3.0.0 in /usr/local/lib/python3.11/dist-packages (from torch<=2.8.0,>=1.13.0->rfdetr) (3.0.0)
+Requirement already satisfied: pillow!=8.3.*,>=5.3.0 in /usr/local/lib/python3.11/dist-packages (from torchvision>=0.14.0->rfdetr) (10.2.0)
+Collecting contourpy>=1.0.1 (from matplotlib->rfdetr)
+  Downloading contourpy-1.3.3-cp311-cp311-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl.metadata (5.5 kB)
+Collecting cycler>=0.10 (from matplotlib->rfdetr)
+  Downloading cycler-0.12.1-py3-none-any.whl.metadata (3.8 kB)
+Collecting fonttools>=4.22.0 (from matplotlib->rfdetr)
+  Downloading fonttools-4.61.1-cp311-cp311-manylinux2014_x86_64.manylinux_2_17_x86_64.whl.metadata (114 kB)
+Collecting kiwisolver>=1.3.1 (from matplotlib->rfdetr)
+  Downloading kiwisolver-1.4.9-cp311-cp311-manylinux2014_x86_64.manylinux_2_17_x86_64.whl.metadata (6.3 kB)
+Requirement already satisfied: packaging>=20.0 in /usr/local/lib/python3.11/dist-packages (from matplotlib->rfdetr) (24.1)
+Collecting pyparsing>=3 (from matplotlib->rfdetr)
+  Downloading pyparsing-3.3.2-py3-none-any.whl.metadata (5.8 kB)
+Requirement already satisfied: python-dateutil>=2.7 in /usr/local/lib/python3.11/dist-packages (from matplotlib->rfdetr) (2.9.0.post0)
+Requirement already satisfied: psutil in /usr/local/lib/python3.11/dist-packages (from peft->rfdetr) (6.0.0)
+Requirement already satisfied: pyyaml in /usr/local/lib/python3.11/dist-packages (from peft->rfdetr) (6.0.2)
+Collecting accelerate>=0.21.0 (from peft->rfdetr)
+  Downloading accelerate-1.12.0-py3-none-any.whl.metadata (19 kB)
+Collecting safetensors (from peft->rfdetr)
+  Downloading safetensors-0.7.0-cp38-abi3-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (4.1 kB)
+Collecting huggingface_hub>=0.25.0 (from peft->rfdetr)
+  Downloading huggingface_hub-1.3.3-py3-none-any.whl.metadata (13 kB)
+Collecting annotated-types>=0.6.0 (from pydantic->rfdetr)
+  Downloading annotated_types-0.7.0-py3-none-any.whl.metadata (15 kB)
+Collecting pydantic-core==2.41.5 (from pydantic->rfdetr)
+  Downloading pydantic_core-2.41.5-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (7.3 kB)
+Collecting typing-extensions>=4.8.0 (from torch<=2.8.0,>=1.13.0->rfdetr)
+  Downloading typing_extensions-4.15.0-py3-none-any.whl.metadata (3.3 kB)
+Collecting typing-inspection>=0.4.2 (from pydantic->rfdetr)
+  Downloading typing_inspection-0.4.2-py3-none-any.whl.metadata (2.6 kB)
+Requirement already satisfied: certifi in /usr/local/lib/python3.11/dist-packages (from roboflow->rfdetr) (2024.8.30)
+Collecting idna==3.7 (from roboflow->rfdetr)
+  Downloading idna-3.7-py3-none-any.whl.metadata (9.9 kB)
+Collecting opencv-python-headless==4.10.0.84 (from roboflow->rfdetr)
+  Downloading opencv_python_headless-4.10.0.84-cp37-abi3-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (20 kB)
+Collecting python-dotenv (from roboflow->rfdetr)
+  Downloading python_dotenv-1.2.1-py3-none-any.whl.metadata (25 kB)
+Requirement already satisfied: requests in /usr/local/lib/python3.11/dist-packages (from roboflow->rfdetr) (2.32.3)
+Requirement already satisfied: six in /usr/lib/python3/dist-packages (from roboflow->rfdetr) (1.16.0)
+Requirement already satisfied: urllib3>=1.26.6 in /usr/local/lib/python3.11/dist-packages (from roboflow->rfdetr) (2.2.3)
+Collecting requests-toolbelt (from roboflow->rfdetr)
+  Downloading requests_toolbelt-1.0.0-py2.py3-none-any.whl.metadata (14 kB)
+Collecting filetype (from roboflow->rfdetr)
+  Downloading filetype-1.2.0-py2.py3-none-any.whl.metadata (6.5 kB)
+Collecting pi-heif<2 (from roboflow->rfdetr)
+  Downloading pi_heif-1.2.0-cp311-cp311-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl.metadata (6.5 kB)
+Collecting numpy (from rfdetr)
+  Downloading numpy-2.4.1-cp311-cp311-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl.metadata (6.6 kB)
+Requirement already satisfied: defusedxml>=0.7.1 in /usr/local/lib/python3.11/dist-packages (from supervision->rfdetr) (0.7.1)
+Collecting opencv-python>=4.5.5.64 (from supervision->rfdetr)
+  Downloading opencv_python-4.13.0.90-cp37-abi3-manylinux_2_28_x86_64.whl.metadata (19 kB)
+Collecting huggingface_hub>=0.25.0 (from peft->rfdetr)
+  Downloading huggingface_hub-0.36.0-py3-none-any.whl.metadata (14 kB)
+Collecting regex!=2019.12.17 (from transformers->rfdetr)
+  Downloading regex-2026.1.15-cp311-cp311-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl.metadata (40 kB)
+Collecting tokenizers<=0.23.0,>=0.22.0 (from transformers->rfdetr)
+  Downloading tokenizers-0.22.2-cp39-abi3-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (7.3 kB)
+Collecting hf-xet<2.0.0,>=1.1.3 (from huggingface_hub>=0.25.0->peft->rfdetr)
+  Downloading hf_xet-1.2.0-cp37-abi3-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (4.9 kB)
+Collecting pillow!=8.3.*,>=5.3.0 (from torchvision>=0.14.0->rfdetr)
+  Downloading pillow-12.1.0-cp311-cp311-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl.metadata (8.8 kB)
+Requirement already satisfied: charset-normalizer<4,>=2 in /usr/local/lib/python3.11/dist-packages (from requests->roboflow->rfdetr) (3.3.2)
+Requirement already satisfied: MarkupSafe>=2.0 in /usr/local/lib/python3.11/dist-packages (from jinja2->torch<=2.8.0,>=1.13.0->rfdetr) (2.1.5)
+Requirement already satisfied: mpmath>=0.19 in /usr/local/lib/python3.11/dist-packages (from sympy->torch<=2.8.0,>=1.13.0->rfdetr) (1.3.0)
+Downloading rfdetr-1.4.0.post0-py3-none-any.whl (156 kB)
+Downloading pillow_avif_plugin-1.5.2-cp311-cp311-manylinux_2_28_x86_64.whl (4.2 MB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 4.2/4.2 MB 52.9 MB/s eta 0:00:00
+
+Downloading matplotlib-3.10.8-cp311-cp311-manylinux2014_x86_64.manylinux_2_17_x86_64.whl (8.7 MB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 8.7/8.7 MB 206.0 MB/s eta 0:00:00
+
+Downloading peft-0.18.1-py3-none-any.whl (556 kB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 557.0/557.0 kB 90.9 MB/s eta 0:00:00
+
+Downloading polygraphy-0.49.26-py2.py3-none-any.whl (372 kB)
+Downloading pycocotools-2.0.11-cp311-cp311-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl (493 kB)
+Downloading pydantic-2.12.5-py3-none-any.whl (463 kB)
+Downloading pydantic_core-2.41.5-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (2.1 MB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 2.1/2.1 MB 229.8 MB/s eta 0:00:00
+
+Downloading rf100vl-1.1.0-py3-none-any.whl (16 kB)
+Downloading roboflow-1.2.13-py3-none-any.whl (91 kB)
+Downloading idna-3.7-py3-none-any.whl (66 kB)
+Downloading opencv_python_headless-4.10.0.84-cp37-abi3-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (49.9 MB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 49.9/49.9 MB 123.7 MB/s eta 0:00:00
+
+Downloading tqdm-4.67.1-py3-none-any.whl (78 kB)
+Downloading scipy-1.17.0-cp311-cp311-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl (35.1 MB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 35.1/35.1 MB 200.7 MB/s eta 0:00:00
+
+Downloading numpy-2.4.1-cp311-cp311-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl (16.7 MB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 16.7/16.7 MB 207.7 MB/s eta 0:00:00
+
+Downloading supervision-0.27.0-py3-none-any.whl (212 kB)
+Downloading transformers-4.57.6-py3-none-any.whl (12.0 MB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 12.0/12.0 MB 198.8 MB/s eta 0:00:00
+
+Downloading accelerate-1.12.0-py3-none-any.whl (380 kB)
+Downloading annotated_types-0.7.0-py3-none-any.whl (13 kB)
+Downloading contourpy-1.3.3-cp311-cp311-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl (355 kB)
+Downloading cycler-0.12.1-py3-none-any.whl (8.3 kB)
+Downloading fonttools-4.61.1-cp311-cp311-manylinux2014_x86_64.manylinux_2_17_x86_64.whl (5.0 MB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 5.0/5.0 MB 224.5 MB/s eta 0:00:00
+
+Downloading huggingface_hub-0.36.0-py3-none-any.whl (566 kB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 566.1/566.1 kB 98.1 MB/s eta 0:00:00
+
+Downloading kiwisolver-1.4.9-cp311-cp311-manylinux2014_x86_64.manylinux_2_17_x86_64.whl (1.4 MB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 1.4/1.4 MB 161.0 MB/s eta 0:00:00
+
+Downloading opencv_python-4.13.0.90-cp37-abi3-manylinux_2_28_x86_64.whl (72.9 MB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 72.9/72.9 MB 153.3 MB/s eta 0:00:00
+
+Downloading pi_heif-1.2.0-cp311-cp311-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl (1.5 MB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 1.5/1.5 MB 71.9 MB/s eta 0:00:00
+
+Downloading pillow-12.1.0-cp311-cp311-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl (7.0 MB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 7.0/7.0 MB 198.6 MB/s eta 0:00:00
+
+Downloading pyparsing-3.3.2-py3-none-any.whl (122 kB)
+Downloading regex-2026.1.15-cp311-cp311-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl (800 kB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 800.5/800.5 kB 107.7 MB/s eta 0:00:00
+
+Downloading safetensors-0.7.0-cp38-abi3-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (507 kB)
+Downloading tokenizers-0.22.2-cp39-abi3-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (3.3 MB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 3.3/3.3 MB 178.8 MB/s eta 0:00:00
+
+Downloading typing_extensions-4.15.0-py3-none-any.whl (44 kB)
+Downloading typing_inspection-0.4.2-py3-none-any.whl (14 kB)
+Downloading filetype-1.2.0-py2.py3-none-any.whl (19 kB)
+Downloading python_dotenv-1.2.1-py3-none-any.whl (21 kB)
+Downloading requests_toolbelt-1.0.0-py2.py3-none-any.whl (54 kB)
+Downloading hf_xet-1.2.0-cp37-abi3-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (3.3 MB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 3.3/3.3 MB 251.9 MB/s eta 0:00:00
+
+Installing collected packages: pillow-avif-plugin, filetype, typing-extensions, tqdm, safetensors, regex, python-dotenv, pyparsing, polygraphy, pillow, numpy, kiwisolver, idna, hf-xet, fonttools, cycler, annotated-types, typing-inspection, scipy, pydantic-core, pycocotools, pi-heif, opencv-python-headless, opencv-python, contourpy, requests-toolbelt, pydantic, matplotlib, huggingface_hub, tokenizers, supervision, roboflow, accelerate, transformers, rf100vl, peft, rfdetr
+  Attempting uninstall: typing-extensions
+    Found existing installation: typing_extensions 4.9.0
+    Uninstalling typing_extensions-4.9.0:
+      Successfully uninstalled typing_extensions-4.9.0
+  Attempting uninstall: pyparsing
+    Found existing installation: pyparsing 2.4.7
+    Uninstalling pyparsing-2.4.7:
+      Successfully uninstalled pyparsing-2.4.7
+  Attempting uninstall: pillow
+    Found existing installation: pillow 10.2.0
+    Uninstalling pillow-10.2.0:
+      Successfully uninstalled pillow-10.2.0
+  Attempting uninstall: numpy
+    Found existing installation: numpy 1.26.3
+    Uninstalling numpy-1.26.3:
+      Successfully uninstalled numpy-1.26.3
+  Attempting uninstall: idna
+    Found existing installation: idna 3.10
+    Uninstalling idna-3.10:
+      Successfully uninstalled idna-3.10
+Successfully installed accelerate-1.12.0 annotated-types-0.7.0 contourpy-1.3.3 cycler-0.12.1 filetype-1.2.0 fonttools-4.61.1 hf-xet-1.2.0 huggingface_hub-0.36.0 idna-3.7 kiwisolver-1.4.9 matplotlib-3.10.8 numpy-2.4.1 opencv-python-4.13.0.90 opencv-python-headless-4.10.0.84 peft-0.18.1 pi-heif-1.2.0 pillow-12.1.0 pillow-avif-plugin-1.5.2 polygraphy-0.49.26 pycocotools-2.0.11 pydantic-2.12.5 pydantic-core-2.41.5 pyparsing-3.3.2 python-dotenv-1.2.1 regex-2026.1.15 requests-toolbelt-1.0.0 rf100vl-1.1.0 rfdetr-1.4.0.post0 roboflow-1.2.13 safetensors-0.7.0 scipy-1.17.0 supervision-0.27.0 tokenizers-0.22.2 tqdm-4.67.1 transformers-4.57.6 typing-extensions-4.15.0 typing-inspection-0.4.2
+WARNING: Running pip as the 'root' user can result in broken permissions and conflicting behaviour with the system package manager, possibly rendering your system unusable.It is recommended to use a virtual environment instead: https://pip.pypa.io/warnings/venv. Use the --root-user-action option if you know what you are doing and want to suppress this warning.
+
+[notice] A new release of pip is available: 24.2 -> 25.3
+[notice] To update, run: python -m pip install --upgrade pip
