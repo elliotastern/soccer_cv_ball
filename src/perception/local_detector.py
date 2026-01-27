@@ -14,13 +14,13 @@ from src.types import Detection
 class LocalDetector:
     """Local DETR detector using trained PyTorch model"""
     
-    def __init__(self, model_path: str, confidence_threshold: float = 0.5, device: str = None):
+    def __init__(self, model_path: str, confidence_threshold: float = 0.05, device: str = None):
         """
         Initialize local detector
         
         Args:
             model_path: Path to trained model checkpoint
-            confidence_threshold: Minimum confidence for detections
+            confidence_threshold: Minimum confidence for detections (default 0.05 for small objects)
             device: Device to run on ('cuda' or 'cpu'), auto-detect if None
         """
         self.confidence_threshold = confidence_threshold

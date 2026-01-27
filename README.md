@@ -1,75 +1,65 @@
-# Soccer Analysis Pipeline
+---
+license: mit
+tags:
+- computer-vision
+- object-detection
+- soccer
+- ball-detection
+- detr
+- rf-detr
+- pytorch
+datasets:
+- custom
+metrics:
+- mAP
+- precision
+- recall
+---
 
-**GitHub Repository**: https://github.com/elliotastern/soccer_coach_cv
+# Soccer Ball Detection with RF-DETR
 
-Automated football analysis pipeline using RF-DETR detection, ByteTrack tracking, and heuristic event detection.
+Automated soccer ball detection pipeline using RF-DETR (Roboflow DETR) optimized for tiny object detection (<15 pixels).
 
-## Architecture
+## Model Details
 
-The pipeline follows a modular architecture:
+### Architecture
+- **Model**: RF-DETR Base
+- **Backbone**: ResNet-50
+- **Classes**: Ball (single class detection)
+- **Input Resolution**: 1120x1120 (optimized for memory)
+- **Precision**: Mixed Precision (FP16/FP32) training, FP16 inference
 
-- **Perception Layer**: Frame filtering, detection, tracking, team assignment
-- **Analysis Layer**: Coordinate mapping, event detection, event aggregation
-- **Visualization Layer**: Review dashboard, annotation tools
+### Performance
+Based on training evaluation report (Epoch 39):
+- **mAP@0.5:0.95**: 0.682 (68.2%)
+- **mAP@0.5**: 0.990 (99.0%)
+- **Small Objects mAP**: 0.598 (59.8%)
+- **Training Loss**: 3.073
+- **Validation Loss**: 3.658
 
-## Precision & Quantization Strategy
+## Quick Start
 
-**IMPORTANT:** This project uses a specific precision strategy optimized for tiny object detection (<15 pixels):
-
-### 1. Training: Mixed Precision (FP16/FP32)
-- **Status:** ✅ Active (RF-DETR default `amp=True`)
-- **Why:** Essential to capture tiny gradients of small objects
-- **Result:** ~2x faster training with minimal accuracy loss
-
-### 2. MVP Deployment: FP16 (Half Precision)
-- **Status:** ✅ Active for all devices (CUDA and CPU)
-- **Why:** Safest start. ~3x speedup on NVIDIA GPUs with zero accuracy loss
-- **Implementation:** `model.half()` in `src/perception/local_detector.py`
-- **Use this for:** First production release
-
-### 3. Future Optimization: INT8 via QAT (Quantization-Aware Training)
-- **Status:** 🔄 Future optimization only (if FP16 is too slow)
-- **Critical:** Use **QAT** (Quantization-Aware Training), **NOT PTQ** (Post-Training Quantization)
-- **Why:** QAT preserves tiny object detection; PTQ may lose it
-- **When:** Edge devices, mobile, very slow inference requirements
-
-**Key Rule:** For tiny object detection, always use QAT for INT8, never PTQ.
-
-See `docs/DEPLOYMENT_STRATEGY.md` for detailed implementation guide.
-
-## Setup
-
-### 1. Install Dependencies
+### Installation
 
 ```bash
 pip install -r requirements.txt
 ```
 
-**Key Dependencies:**
-- PyTorch & Torchvision (training)
-- Transformers (DETR model)
-- MLflow (experiment tracking)
-- TensorBoard (metrics visualization)
-- Streamlit (dashboard)
+### Usage
 
-### 2. Configure Environment
+```python
+from src.perception.local_detector import LocalDetector
+from pathlib import Path
 
-Create a `.env` file with your Roboflow API key:
+# Initialize detector
+detector = LocalDetector(
+    model_path="models/checkpoints/latest_checkpoint.pth",
+    config_path="configs/default.yaml"
+)
 
-```bash
-ROBOFLOW_API_KEY=your_api_key_here
+# Detect ball in image
+results = detector.detect(image_path)
 ```
-
-### 3. Configure Model
-
-Edit `configs/default.yaml` and set your RF-DETR model ID:
-
-```yaml
-roboflow:
-  model_id: "your-model-id"
-```
-
-## Usage
 
 ### Process Video
 
@@ -77,81 +67,84 @@ roboflow:
 python main.py --video path/to/video.mp4 --config configs/default.yaml --output data/output
 ```
 
-### Review Dashboard
+## Training
+
+### Train from Scratch
 
 ```bash
-streamlit run src/visualization/app.py
+python scripts/train_ball.py \
+    --config configs/training.yaml \
+    --dataset-dir datasets/combined \
+    --output-dir models \
+    --epochs 50
 ```
 
-Or use the RunPod script:
+### Resume Training
 
 ```bash
-./runpod.sh
-```
-
-## Output
-
-The pipeline generates:
-
-- `events.json`: Event-centric JSON output
-- `events.csv`: Frame-by-frame CSV data
-- `frame_data.csv`: Detailed frame data
-- `checkpoints/`: Periodic checkpoint files
-
-## Configuration
-
-### Default Config (`configs/default.yaml`)
-
-- Detection thresholds
-- Tracker parameters (ByteTrack)
-- Event detection thresholds
-- Checkpoint intervals
-
-### Zones Config (`configs/zones.yaml`)
-
-Defines tactical zones (Zone 14, Half-Spaces, Goal Area, etc.)
-
-## Docker
-
-Build and run:
-
-```bash
-docker build -t soccer-analysis .
-docker run -p 8501:8501 soccer-analysis
+python scripts/train_ball.py \
+    --config configs/resume_20_epochs.yaml \
+    --dataset-dir datasets/combined \
+    --output-dir models \
+    --resume models/checkpoints/latest_checkpoint.pth \
+    --epochs 50
 ```
 
 ## Project Structure
 
 ```
-soccer_coach_cv/
+soccer_cv_ball/
 ├── main.py                 # Main orchestrator
 ├── configs/               # Configuration files
 ├── src/
-│   ├── perception/        # Detection, tracking, team assignment
-│   ├── analysis/         # Mapping, event detection
-│   ├── visualization/    # Streamlit dashboard
-│   ├── types.py          # Data classes
-│   └── schema.py        # Output schemas
-├── data/
-│   ├── raw/              # Input videos
-│   └── output/           # Generated outputs
-└── models/               # Model files
-
+│   ├── perception/        # Detection, tracking
+│   ├── analysis/         # Event detection
+│   ├── visualization/    # Dashboard
+│   └── training/         # Training utilities
+├── scripts/               # Training and utility scripts
+├── models/               # Model checkpoints
+└── data/                 # Dataset (not included)
 ```
 
-## Event Types
+## Configuration
 
-- **Pass**: Ball movement with velocity > threshold
-- **Dribble**: Player maintains close control of ball
-- **Shot**: High-velocity ball movement toward goal
-- **Recovery**: Player gains possession of ball
-- **Movement**: General player movement
+Key configuration files:
+- `configs/training.yaml` - Main training configuration
+- `configs/default.yaml` - Inference configuration
+- `configs/resume_*.yaml` - Resume training configurations
 
-## Legal & Technical Guardrails
+## Datasets
 
-- Only synthetic data (SoccerSynth-Detection dataset)
-- No licensed/proprietary match footage
-- RF-DETR for detection (not YOLO)
-- COCO JSON format for detections
-- ByteTrack for multi-object tracking
-- **Precision Strategy:** Mixed Precision (FP16/FP32) for training, FP16 for MVP deployment, QAT (not PTQ) for future INT8 optimization
+This model was trained on:
+- SoccerSynth-Detection (synthetic data)
+- Open Soccer Ball Dataset
+- Custom validation sets
+
+## Precision Strategy
+
+- **Training**: Mixed Precision (FP16/FP32) - RF-DETR default
+- **Inference**: FP16 (half precision) for ~3x speedup
+- **Future**: INT8 via QAT (Quantization-Aware Training) for edge devices
+
+## Citation
+
+If you use this model, please cite:
+
+```bibtex
+@software{soccer_ball_detection,
+  title={Soccer Ball Detection with RF-DETR},
+  author={Your Name},
+  year={2026},
+  url={https://huggingface.co/eeeeeeeeeeeeee3/soccer-ball-detection}
+}
+```
+
+## License
+
+MIT License - See LICENSE file for details.
+
+## Acknowledgments
+
+- RF-DETR by Roboflow
+- SoccerSynth-Detection dataset
+- Open Soccer Ball Dataset

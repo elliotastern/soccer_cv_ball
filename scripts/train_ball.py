@@ -428,6 +428,20 @@ def prepare_dataset(config: Dict, force_convert: bool = False) -> Tuple[str, str
     voc_val_annotations = dataset_config.get('voc_val_annotations')
     voc_val_images = dataset_config.get('voc_val_images')
     
+    # Check if COCO format is already provided (skip conversion)
+    coco_train_path_check = Path(dataset_config.get('coco_train_path', ''))
+    coco_val_path_check = Path(dataset_config.get('coco_val_path', ''))
+    
+    if coco_train_path_check.exists() and (coco_train_path_check / "_annotations.coco.json").exists():
+        # COCO format already exists, use it directly
+        print(f"\n✅ Using existing COCO format dataset")
+        print(f"   Train: {coco_train_path_check}")
+        if coco_val_path_check.exists() and (coco_val_path_check / "_annotations.coco.json").exists():
+            print(f"   Val: {coco_val_path_check}")
+            return str(coco_train_path_check), str(coco_val_path_check)
+        else:
+            return str(coco_train_path_check), str(coco_train_path_check)
+    
     is_voc_format = voc_train_path is not None
     
     if is_voc_format:
@@ -955,31 +969,64 @@ def main():
         print(f"\nTraining for {num_epochs} epochs with evaluation every {eval_frequency} epoch(s)...")
         
         # Check for existing checkpoint to resume from
-        checkpoint_files = list(Path(output_dir).glob("*.pth"))
+        # First, check if config specifies a resume checkpoint
+        checkpoint_config = config.get('checkpoint', {})
+        resume_from_config = checkpoint_config.get('resume_from')
+        start_epoch_from_config = checkpoint_config.get('start_epoch')
+        
         start_epoch = 0
         latest_checkpoint_path = None
-        if checkpoint_files:
-            # Prefer checkpoint.pth (main checkpoint) over best checkpoints
-            main_checkpoint = Path(output_dir) / "checkpoint.pth"
-            if main_checkpoint.exists():
-                checkpoint_to_check = main_checkpoint
+        
+        # If config specifies a resume checkpoint, use it
+        if resume_from_config:
+            resume_path = Path(resume_from_config)
+            if resume_path.exists():
+                latest_checkpoint_path = str(resume_path)
+                try:
+                    import torch
+                    checkpoint = torch.load(str(resume_path), map_location='cpu', weights_only=False)
+                    if 'epoch' in checkpoint:
+                        start_epoch = checkpoint['epoch'] + 1
+                        print(f"📁 Found checkpoint from config: {resume_path.name}")
+                        print(f"   Epoch: {checkpoint['epoch']}")
+                        print(f"🔄 Resuming training from epoch {start_epoch}/{num_epochs}")
+                    elif start_epoch_from_config is not None:
+                        start_epoch = start_epoch_from_config
+                        print(f"📁 Using checkpoint from config: {resume_path.name}")
+                        print(f"🔄 Resuming training from epoch {start_epoch}/{num_epochs} (from config)")
+                    else:
+                        print(f"⚠️  Checkpoint found but no epoch info, starting from epoch 0")
+                except Exception as e:
+                    print(f"⚠️  Could not load checkpoint info: {e}")
+                    print(f"   Starting from epoch 0")
             else:
-                # Fall back to latest by modification time
-                checkpoint_to_check = max(checkpoint_files, key=lambda p: p.stat().st_mtime)
-            
-            latest_checkpoint_path = str(checkpoint_to_check)
-            try:
-                import torch
-                checkpoint = torch.load(str(checkpoint_to_check), map_location='cpu', weights_only=False)
-                if 'epoch' in checkpoint:
-                    start_epoch = checkpoint['epoch'] + 1
-                    print(f"📁 Found checkpoint from epoch {checkpoint['epoch']}")
-                    print(f"🔄 Resuming training from epoch {start_epoch}/{num_epochs}")
+                print(f"⚠️  Checkpoint path from config not found: {resume_from_config}")
+        
+        # If no config checkpoint, check output directory
+        if not latest_checkpoint_path:
+            checkpoint_files = list(Path(output_dir).glob("*.pth"))
+            if checkpoint_files:
+                # Prefer checkpoint.pth (main checkpoint) over best checkpoints
+                main_checkpoint = Path(output_dir) / "checkpoint.pth"
+                if main_checkpoint.exists():
+                    checkpoint_to_check = main_checkpoint
                 else:
-                    print(f"⚠️  Checkpoint found but no epoch info, starting from epoch 0")
-            except Exception as e:
-                print(f"⚠️  Could not load checkpoint info: {e}")
-                print(f"   Starting from epoch 0")
+                    # Fall back to latest by modification time
+                    checkpoint_to_check = max(checkpoint_files, key=lambda p: p.stat().st_mtime)
+                
+                latest_checkpoint_path = str(checkpoint_to_check)
+                try:
+                    import torch
+                    checkpoint = torch.load(str(checkpoint_to_check), map_location='cpu', weights_only=False)
+                    if 'epoch' in checkpoint:
+                        start_epoch = checkpoint['epoch'] + 1
+                        print(f"📁 Found checkpoint from epoch {checkpoint['epoch']}")
+                        print(f"🔄 Resuming training from epoch {start_epoch}/{num_epochs}")
+                    else:
+                        print(f"⚠️  Checkpoint found but no epoch info, starting from epoch 0")
+                except Exception as e:
+                    print(f"⚠️  Could not load checkpoint info: {e}")
+                    print(f"   Starting from epoch 0")
         
         # RF-DETR's train() method is designed to train all epochs in one call
         # It handles checkpointing and resuming internally
@@ -1075,6 +1122,12 @@ def main():
                 'device': training_config.get('device', 'cuda'),
                 'num_workers': training_config.get('num_workers', 4)
             }
+            
+            # Add memory optimization parameters if specified
+            if 'multi_scale' in training_config:
+                train_kwargs['multi_scale'] = training_config['multi_scale']
+            if 'expanded_scales' in training_config:
+                train_kwargs['expanded_scales'] = training_config['expanded_scales']
             
             # Add resume parameter if we have a checkpoint
             # This tells RF-DETR the starting epoch and loads optimizer/LR scheduler state
