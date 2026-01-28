@@ -71,7 +71,7 @@ dataset:
 
 checkpoint:
   resume_from: /workspace/soccer_cv_ball/models/checkpoint.pth
-  start_epoch: 50  # Phase 1 complete, starting Phase 1.5 (high-res)
+  start_epoch: 52  # Resuming from epoch 51 checkpoint (epoch 52 was incomplete)
   save_dir: models/checkpoints
 
 # Changes from Phase 1:

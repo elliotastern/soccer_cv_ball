@@ -1,0 +1,184 @@
+{
+  "metrics": {
+    "20": {
+      "map_50_95": 0.661,
+      "map_50": 0.989,
+      "map_small": 0.527,
+      "train_loss": 4.2466,
+      "val_loss": 4.039
+    },
+    "21": {
+      "map_50_95": 0.66,
+      "map_50": 0.979,
+      "map_small": 0.552,
+      "train_loss": 3.9362,
+      "val_loss": 3.8474
+    },
+    "22": {
+      "map_50_95": 0.668,
+      "map_50": 0.989,
+      "map_small": 0.522,
+      "train_loss": 3.6121,
+      "val_loss": 3.9631
+    },
+    "23": {
+      "map_50_95": 0.66,
+      "map_50": 0.988,
+      "map_small": 0.538,
+      "train_loss": 3.6912,
+      "val_loss": 3.9654
+    },
+    "24": {
+      "map_50_95": 0.668,
+      "map_50": 0.99,
+      "map_small": 0.559,
+      "train_loss": 3.4641,
+      "val_loss": 3.8922
+    },
+    "25": {
+      "map_50_95": 0.666,
+      "map_50": 0.984,
+      "map_small": 0.556,
+      "train_loss": 3.1745,
+      "val_loss": 3.8886
+    },
+    "26": {
+      "map_50_95": 0.66,
+      "map_50": 0.987,
+      "map_small": 0.569,
+      "train_loss": 3.2887,
+      "val_loss": 3.7544
+    },
+    "27": {
+      "map_50_95": 0.671,
+      "map_50": 0.988,
+      "map_small": 0.586,
+      "train_loss": 3.4489,
+      "val_loss": 3.7287
+    },
+    "28": {
+      "map_50_95": 0.667,
+      "map_50": 0.989,
+      "map_small": 0.575,
+      "train_loss": 3.5175,
+      "val_loss": 3.9482
+    },
+    "29": {
+      "map_50_95": 0.679,
+      "map_50": 0.989,
+      "map_small": 0.588,
+      "train_loss": 3.3574,
+      "val_loss": 3.8662
+    },
+    "30": {
+      "map_50_95": 0.678,
+      "map_50": 0.989,
+      "map_small": 0.577,
+      "train_loss": 3.1801,
+      "val_loss": 3.6659
+    },
+    "31": {
+      "map_50_95": 0.691,
+      "map_50": 0.989,
+      "map_small": 0.568,
+      "train_loss": 3.1787,
+      "val_loss": 3.8404
+    },
+    "32": {
+      "map_50_95": 0.68,
+      "map_50": 0.987,
+      "map_small": 0.58,
+      "train_loss": 3.1665,
+      "val_loss": 3.8273
+    },
+    "33": {
+      "map_50_95": 0.679,
+      "map_50": 0.988,
+      "map_small": 0.6,
+      "train_loss": 3.0651,
+      "val_loss": 3.7228
+    },
+    "34": {
+      "map_50_95": 0.674,
+      "map_50": 0.989,
+      "map_small": 0.573,
+      "train_loss": 3.309,
+      "val_loss": 3.8444
+    },
+    "35": {
+      "map_50_95": 0.682,
+      "map_50": 0.989,
+      "map_small": 0.591,
+      "train_loss": 3.4346,
+      "val_loss": 3.7228
+    },
+    "39": {
+      "map_50_95": 0.682,
+      "map_50": 0.99,
+      "map_small": 0.598,
+      "train_loss": 3.0727,
+      "val_loss": 3.6575
+    }
+  },
+  "analysis": {
+    "total_epochs": 17,
+    "epoch_range": [
+      20,
+      39
+    ],
+    "overall_improvement": {
+      "map_50_95": 0.02100000000000002,
+      "map_small": 0.07099999999999995
+    },
+    "recent_trend": {
+      "map_50_95_change": 0.0020000000000000018,
+      "map_small_change": 0.018000000000000016,
+      "epochs": [
+        32,
+        33,
+        34,
+        35,
+        39
+      ]
+    },
+    "improvement_rate": {
+      "map_50_95_per_epoch": 0.0013125000000000012,
+      "map_small_per_epoch": 0.004437499999999997
+    },
+    "plateau_detected": false,
+    "plateau_epochs": [],
+    "overfitting_detected": false,
+    "overfitting_evidence": [],
+    "recommendations": [
+      "Small objects mAP < 0.65: Focus on small object augmentation",
+      "Consider increasing resolution or enabling multi-scale training",
+      "Metrics still improving: Continue training to 50-60 epochs"
+    ]
+  },
+  "config_analysis": {
+    "learning_rate": 0.0002,
+    "lr_schedule": "Not specified (RF-DETR may have defaults)",
+    "batch_size": 2,
+    "resolution": 1120,
+    "multi_scale": false,
+    "augmentation": "Not specified in config (RF-DETR defaults unknown)",
+    "grad_accum_steps": 20,
+    "issues": [
+      "Very small batch size may limit gradient quality",
+      "Multi-scale training disabled (may help small objects)",
+      "Resolution reduced (may hurt small object detection)"
+    ]
+  },
+  "recommendations": [
+    "\u2705 CONTINUE TRAINING: Metrics still improving and small objects < 0.70",
+    "   \u2192 Continue to 50-60 epochs with current settings",
+    "\ud83c\udfaf SMALL OBJECTS NEED IMPROVEMENT",
+    "   \u2192 Focus on small object augmentation (copy-paste, mosaic)",
+    "   \u2192 Increase resolution if possible",
+    "   \u2192 Enable multi-scale training",
+    "   \u2192 Consider adjusting loss weights for small objects",
+    "\u2699\ufe0f CONFIG CHANGE: Enable multi-scale training",
+    "   \u2192 May help with small object detection",
+    "   \u2192 Monitor memory usage"
+  ]
+}
