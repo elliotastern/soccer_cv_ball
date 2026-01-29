@@ -1,0 +1,67 @@
+# Resume Training Configuration - Phase 4 Extended Fine-Tuning
+# Extended training with reduced learning rate for fine-tuning
+# Target: Improve frame-level detection accuracy (currently 7/20 = 35%)
+
+model:
+  architecture: detr
+  backbone: resnet50
+  num_classes: 2
+  pretrained: true
+  hidden_dim: 256
+  nheads: 8
+  num_encoder_layers: 6
+  num_decoder_layers: 6
+  rfdetr_size: base
+  remap_mscoco_category: false
+
+training:
+  batch_size: 2  # Keep at 2 (already minimum)
+  learning_rate: 0.00005  # Reduced LR for fine-tuning (50% of Phase 3's 0.0001)
+  epochs: 90  # Extended to 90 epochs (20 more epochs from Phase 3)
+  weight_decay: 0.0001
+  gradient_clip: 0.1
+  grad_accum_steps: 16  # Effective batch size (2*16=32)
+  resolution: 1288  # Keep high resolution from Phase 1.5
+  num_workers: 1
+  device: cuda
+  mixed_precision: true
+  # Enable multi-scale training for small object detection
+  multi_scale: true  # ENABLED - helps with small objects
+  expanded_scales: false  # Keep disabled to save memory
+  
+dataset:
+  coco_train_path: /workspace/soccer_cv_ball/models/ball_detection_combined_optimized/dataset/train
+  coco_val_path: /workspace/soccer_cv_ball/models/ball_detection_combined_optimized/dataset/valid
+  category_name: "ball"
+  category_id: 0
+  ball_class_id: 1
+  pin_memory: false
+  prefetch_factor: 1
+  persistent_workers: false
+
+checkpoint:
+  resume_from: /workspace/soccer_cv_ball/models/checkpoint.pth
+  start_epoch: 73  # Resuming from epoch 72 checkpoint (epoch 73 was incomplete)
+  save_dir: models/checkpoints
+
+# Phase 4: Extended Fine-Tuning Training (Epochs 70-90)
+# Resuming from Phase 3 completion (Epoch 69)
+# Current performance: 0.680 mAP, 0.655 small objects mAP
+# Test result: 7/20 frames detected (35% success rate)
+#
+# Changes from Phase 3:
+# - learning_rate: 0.0001 -> 0.00005 (50% reduction for fine-tuning)
+# - epochs: 70 -> 90 (train 20 more epochs)
+# - start_epoch: 60 -> 70 (resume from epoch 69)
+#
+# Benefits:
+# - Reduced LR allows smaller, more precise weight adjustments
+# - Extended training gives model time to learn from difficult edge cases
+# - Maintains multi-scale and high-res settings that are working well
+# - Expected improvement: 0.655 -> 0.67-0.68 small objects mAP
+# - Expected frame detection: 7/20 (35%) -> 12-15/20 (60-75%)
+#
+# Strategy:
+# - Fine-tuning approach with smaller learning steps
+# - More epochs to capture edge cases that cause missed detections
+# - Maintain all successful Phase 3 settings (multi-scale, 1288px)

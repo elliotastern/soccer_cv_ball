@@ -16,12 +16,12 @@ model:
 
 training:
   batch_size: 2  # Keep at 2 (already minimum)
-  learning_rate: 0.0002
-  epochs: 50  # Extended to 50 epochs
+  learning_rate: 0.0001  # Reduced LR for fine-tuning phase
+  epochs: 70  # Extended to 70 epochs (Phase 3)
   weight_decay: 0.0001
   gradient_clip: 0.1
-  grad_accum_steps: 20  # Maintain effective batch size (2*20=40)
-  resolution: 1120  # Keep reduced resolution for memory
+  grad_accum_steps: 16  # Effective batch size (2*16=32)
+  resolution: 1288  # Keep high resolution from Phase 1.5
   num_workers: 1
   device: cuda
   mixed_precision: true
@@ -41,18 +41,22 @@ dataset:
 
 checkpoint:
   resume_from: /workspace/soccer_cv_ball/models/checkpoint.pth
-  start_epoch: 40  # Update after epoch 40 completes
+  start_epoch: 60  # Resuming from epoch 59 checkpoint (Phase 1.5 complete)
   save_dir: models/checkpoints
 
-# Changes from base config:
-# - multi_scale: false -> true (enables multi-scale training)
-# - epochs: 40 -> 50 (extended training)
-# - start_epoch: 38 -> 40 (resume from epoch 40)
+# Phase 3: Multi-Scale Training (Epochs 60-70)
+# Resuming from Phase 1.5 completion (Epoch 59)
+# Current performance: 0.679 mAP, 0.653 small objects mAP
+#
+# Changes from Phase 1.5:
+# - multi_scale: true (ENABLED for scale invariance)
+# - learning_rate: 0.0001 (reduced for fine-tuning)
+# - epochs: 70 (train 10 more epochs)
 #
 # Benefits:
 # - Multi-scale training helps model learn at multiple scales
 # - Particularly beneficial for small object (ball) detection
-# - May improve small objects mAP from 0.598 to >0.65
+# - Expected improvement: 0.653 -> 0.67+ small objects mAP
 #
 # Risks:
 # - May increase GPU memory usage
