@@ -5,7 +5,7 @@ roboflow:
 
 # Detection Settings
 detection:
-  confidence_threshold: 0.5
+  confidence_threshold: 0.10  # Optimized for 45% recall, 100% precision (Epoch 89)
   player_class_id: 0
   ball_class_id: 1
 

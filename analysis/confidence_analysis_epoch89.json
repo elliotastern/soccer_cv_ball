@@ -1,0 +1,398 @@
+{
+  "overall_stats": {
+    "total_detections": 17,
+    "mean_confidence": 0.1257600243038991,
+    "median_confidence": 0.08038444072008133,
+    "std_confidence": 0.09841107032130714,
+    "min_confidence": 0.05146331340074539,
+    "max_confidence": 0.37700527906417847,
+    "percentiles": {
+      "p10": 0.054168806225061414,
+      "p25": 0.059302665293216705,
+      "p50": 0.08038444072008133,
+      "p75": 0.12659086287021637,
+      "p90": 0.2587451040744782,
+      "p95": 0.3690329909324646,
+      "p99": 0.3754108214378357
+    }
+  },
+  "threshold_analysis": {
+    "0.1": {
+      "total_detections": 7,
+      "frames_with_detections": 7,
+      "avg_detections_per_frame": 0.35
+    },
+    "0.2": {
+      "total_detections": 2,
+      "frames_with_detections": 2,
+      "avg_detections_per_frame": 0.1
+    },
+    "0.3": {
+      "total_detections": 2,
+      "frames_with_detections": 2,
+      "avg_detections_per_frame": 0.1
+    },
+    "0.4": {
+      "total_detections": 0,
+      "frames_with_detections": 0,
+      "avg_detections_per_frame": 0.0
+    },
+    "0.5": {
+      "total_detections": 0,
+      "frames_with_detections": 0,
+      "avg_detections_per_frame": 0.0
+    }
+  },
+  "frame_analyses": [
+    {
+      "frame_number": 193,
+      "timestamp": 3.219883333333333,
+      "num_detections": 1,
+      "confidences": [
+        0.05492778494954109
+      ],
+      "threshold_counts": {
+        "0.1": 0,
+        "0.2": 0,
+        "0.3": 0,
+        "0.4": 0,
+        "0.5": 0
+      },
+      "max_confidence": 0.05492778494954109,
+      "min_confidence": 0.05492778494954109,
+      "avg_confidence": 0.05492778494954109
+    },
+    {
+      "frame_number": 198,
+      "timestamp": 3.3033,
+      "num_detections": 1,
+      "confidences": [
+        0.053030338138341904
+      ],
+      "threshold_counts": {
+        "0.1": 0,
+        "0.2": 0,
+        "0.3": 0,
+        "0.4": 0,
+        "0.5": 0
+      },
+      "max_confidence": 0.053030338138341904,
+      "min_confidence": 0.053030338138341904,
+      "avg_confidence": 0.053030338138341904
+    },
+    {
+      "frame_number": 309,
+      "timestamp": 5.15515,
+      "num_detections": 1,
+      "confidences": [
+        0.09773094952106476
+      ],
+      "threshold_counts": {
+        "0.1": 0,
+        "0.2": 0,
+        "0.3": 0,
+        "0.4": 0,
+        "0.5": 0
+      },
+      "max_confidence": 0.09773094952106476,
+      "min_confidence": 0.09773094952106476,
+      "avg_confidence": 0.09773094952106476
+    },
+    {
+      "frame_number": 325,
+      "timestamp": 5.422083333333333,
+      "num_detections": 0,
+      "confidences": [],
+      "threshold_counts": {
+        "0.1": 0,
+        "0.2": 0,
+        "0.3": 0,
+        "0.4": 0,
+        "0.5": 0
+      },
+      "max_confidence": 0.0,
+      "min_confidence": 0.0,
+      "avg_confidence": 0.0
+    },
+    {
+      "frame_number": 399,
+      "timestamp": 6.65665,
+      "num_detections": 2,
+      "confidences": [
+        0.11414650082588196,
+        0.05889323353767395
+      ],
+      "threshold_counts": {
+        "0.1": 1,
+        "0.2": 0,
+        "0.3": 0,
+        "0.4": 0,
+        "0.5": 0
+      },
+      "max_confidence": 0.11414650082588196,
+      "min_confidence": 0.05889323353767395,
+      "avg_confidence": 0.08651986718177795
+    },
+    {
+      "frame_number": 421,
+      "timestamp": 7.0236833333333335,
+      "num_detections": 1,
+      "confidences": [
+        0.36703991889953613
+      ],
+      "threshold_counts": {
+        "0.1": 1,
+        "0.2": 1,
+        "0.3": 1,
+        "0.4": 0,
+        "0.5": 0
+      },
+      "max_confidence": 0.36703991889953613,
+      "min_confidence": 0.36703991889953613,
+      "avg_confidence": 0.36703991889953613
+    },
+    {
+      "frame_number": 450,
+      "timestamp": 7.5075,
+      "num_detections": 1,
+      "confidences": [
+        0.11799301952123642
+      ],
+      "threshold_counts": {
+        "0.1": 1,
+        "0.2": 0,
+        "0.3": 0,
+        "0.4": 0,
+        "0.5": 0
+      },
+      "max_confidence": 0.11799301952123642,
+      "min_confidence": 0.11799301952123642,
+      "avg_confidence": 0.11799301952123642
+    },
+    {
+      "frame_number": 454,
+      "timestamp": 7.574233333333334,
+      "num_detections": 1,
+      "confidences": [
+        0.18654856085777283
+      ],
+      "threshold_counts": {
+        "0.1": 1,
+        "0.2": 0,
+        "0.3": 0,
+        "0.4": 0,
+        "0.5": 0
+      },
+      "max_confidence": 0.18654856085777283,
+      "min_confidence": 0.18654856085777283,
+      "avg_confidence": 0.18654856085777283
+    },
+    {
+      "frame_number": 526,
+      "timestamp": 8.775433333333334,
+      "num_detections": 1,
+      "confidences": [
+        0.08038444072008133
+      ],
+      "threshold_counts": {
+        "0.1": 0,
+        "0.2": 0,
+        "0.3": 0,
+        "0.4": 0,
+        "0.5": 0
+      },
+      "max_confidence": 0.08038444072008133,
+      "min_confidence": 0.08038444072008133,
+      "avg_confidence": 0.08038444072008133
+    },
+    {
+      "frame_number": 729,
+      "timestamp": 12.16215,
+      "num_detections": 1,
+      "confidences": [
+        0.37700527906417847
+      ],
+      "threshold_counts": {
+        "0.1": 1,
+        "0.2": 1,
+        "0.3": 1,
+        "0.4": 0,
+        "0.5": 0
+      },
+      "max_confidence": 0.37700527906417847,
+      "min_confidence": 0.37700527906417847,
+      "avg_confidence": 0.37700527906417847
+    },
+    {
+      "frame_number": 781,
+      "timestamp": 13.029683333333333,
+      "num_detections": 2,
+      "confidences": [
+        0.07388430088758469,
+        0.060305383056402206
+      ],
+      "threshold_counts": {
+        "0.1": 0,
+        "0.2": 0,
+        "0.3": 0,
+        "0.4": 0,
+        "0.5": 0
+      },
+      "max_confidence": 0.07388430088758469,
+      "min_confidence": 0.060305383056402206,
+      "avg_confidence": 0.06709484197199345
+    },
+    {
+      "frame_number": 816,
+      "timestamp": 13.6136,
+      "num_detections": 0,
+      "confidences": [],
+      "threshold_counts": {
+        "0.1": 0,
+        "0.2": 0,
+        "0.3": 0,
+        "0.4": 0,
+        "0.5": 0
+      },
+      "max_confidence": 0.0,
+      "min_confidence": 0.0,
+      "avg_confidence": 0.0
+    },
+    {
+      "frame_number": 914,
+      "timestamp": 15.248566666666667,
+      "num_detections": 0,
+      "confidences": [],
+      "threshold_counts": {
+        "0.1": 0,
+        "0.2": 0,
+        "0.3": 0,
+        "0.4": 0,
+        "0.5": 0
+      },
+      "max_confidence": 0.0,
+      "min_confidence": 0.0,
+      "avg_confidence": 0.0
+    },
+    {
+      "frame_number": 925,
+      "timestamp": 15.432083333333333,
+      "num_detections": 0,
+      "confidences": [],
+      "threshold_counts": {
+        "0.1": 0,
+        "0.2": 0,
+        "0.3": 0,
+        "0.4": 0,
+        "0.5": 0
+      },
+      "max_confidence": 0.0,
+      "min_confidence": 0.0,
+      "avg_confidence": 0.0
+    },
+    {
+      "frame_number": 937,
+      "timestamp": 15.632283333333334,
+      "num_detections": 0,
+      "confidences": [],
+      "threshold_counts": {
+        "0.1": 0,
+        "0.2": 0,
+        "0.3": 0,
+        "0.4": 0,
+        "0.5": 0
+      },
+      "max_confidence": 0.0,
+      "min_confidence": 0.0,
+      "avg_confidence": 0.0
+    },
+    {
+      "frame_number": 1032,
+      "timestamp": 17.217200000000002,
+      "num_detections": 0,
+      "confidences": [],
+      "threshold_counts": {
+        "0.1": 0,
+        "0.2": 0,
+        "0.3": 0,
+        "0.4": 0,
+        "0.5": 0
+      },
+      "max_confidence": 0.0,
+      "min_confidence": 0.0,
+      "avg_confidence": 0.0
+    },
+    {
+      "frame_number": 1154,
+      "timestamp": 19.252566666666667,
+      "num_detections": 1,
+      "confidences": [
+        0.12659086287021637
+      ],
+      "threshold_counts": {
+        "0.1": 1,
+        "0.2": 0,
+        "0.3": 0,
+        "0.4": 0,
+        "0.5": 0
+      },
+      "max_confidence": 0.12659086287021637,
+      "min_confidence": 0.12659086287021637,
+      "avg_confidence": 0.12659086287021637
+    },
+    {
+      "frame_number": 1161,
+      "timestamp": 19.36935,
+      "num_detections": 2,
+      "confidences": [
+        0.08009704947471619,
+        0.059302665293216705
+      ],
+      "threshold_counts": {
+        "0.1": 0,
+        "0.2": 0,
+        "0.3": 0,
+        "0.4": 0,
+        "0.5": 0
+      },
+      "max_confidence": 0.08009704947471619,
+      "min_confidence": 0.059302665293216705,
+      "avg_confidence": 0.06969985738396645
+    },
+    {
+      "frame_number": 1292,
+      "timestamp": 21.554866666666666,
+      "num_detections": 0,
+      "confidences": [],
+      "threshold_counts": {
+        "0.1": 0,
+        "0.2": 0,
+        "0.3": 0,
+        "0.4": 0,
+        "0.5": 0
+      },
+      "max_confidence": 0.0,
+      "min_confidence": 0.0,
+      "avg_confidence": 0.0
+    },
+    {
+      "frame_number": 1320,
+      "timestamp": 22.022000000000002,
+      "num_detections": 2,
+      "confidences": [
+        0.17857681214809418,
+        0.05146331340074539
+      ],
+      "threshold_counts": {
+        "0.1": 1,
+        "0.2": 0,
+        "0.3": 0,
+        "0.4": 0,
+        "0.5": 0
+      },
+      "max_confidence": 0.17857681214809418,
+      "min_confidence": 0.05146331340074539,
+      "avg_confidence": 0.11502006277441978
+    }
+  ]
+}

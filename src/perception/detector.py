@@ -9,14 +9,14 @@ from src.types import Detection
 class Detector:
     """RF-DETR detector wrapper using Roboflow SDK"""
     
-    def __init__(self, model_id: str, api_key: str, confidence_threshold: float = 0.5):
+    def __init__(self, model_id: str, api_key: str, confidence_threshold: float = 0.10):
         """
         Initialize detector
         
         Args:
             model_id: Roboflow model ID
             api_key: Roboflow API key
-            confidence_threshold: Minimum confidence for detections
+            confidence_threshold: Minimum confidence for detections (default 0.10 - optimized for ball detection)
         """
         self.confidence_threshold = confidence_threshold
         self.rf = Roboflow(api_key=api_key)

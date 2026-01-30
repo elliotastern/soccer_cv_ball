@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>COCO Bounding Box Editor</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: system-ui, sans-serif; background: #1a1a1a; color: #e0e0e0; padding: 12px; }
+    .header { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; margin-bottom: 12px; padding: 8px 0; border-bottom: 1px solid #333; }
+    .header h1 { font-size: 18px; color: #4CAF50; }
+    .nav { display: flex; align-items: center; gap: 8px; }
+    button { padding: 8px 14px; background: #333; color: #4CAF50; border: 1px solid #4CAF50; border-radius: 4px; cursor: pointer; font-size: 14px; }
+    button:hover { background: #3a3a3a; }
+    button.primary { background: #4CAF50; color: #111; }
+    button.primary:hover { background: #66BB6A; }
+    button.danger { border-color: #f44336; color: #f44336; }
+    button.danger:hover { background: #3a2020; }
+    .info { font-size: 13px; color: #888; }
+    .viewer { position: relative; display: inline-block; max-width: 100%; overflow: auto; background: #000; }
+    .viewer img { display: block; max-height: 85vh; max-width: 100%; }
+    .viewer canvas { position: absolute; left: 0; top: 0; cursor: crosshair; }
+    .status { margin-top: 8px; font-size: 12px; color: #888; }
+    .status.error { color: #f44336; }
+    .status.ok { color: #4CAF50; }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <h1>COCO Bounding Box Editor</h1>
+    <div class="nav">
+      <button id="btnPrev">← Prev</button>
+      <span class="info" id="imageIndex">0 / 0</span>
+      <button id="btnNext">Next →</button>
+      <button id="btnAdd" title="Click-drag on image to add box">Add box</button>
+      <button id="btnDelete" class="danger" title="Delete selected box">Delete</button>
+      <button id="btnSave" class="primary">Save</button>
+    </div>
+  </div>
+  <div class="viewer" id="viewer">
+    <img id="img" alt="frame" />
+    <canvas id="canvas"></canvas>
+  </div>
+  <div class="status" id="status">Load annotations from folder.</div>
+
+  <script>
+    (function () {
+      const COCO_URL = '/_annotations.coco.json';
+      const SAVE_URL = '/save';
+      let coco = null;
+      let imageList = [];
+      let currentIndex = 0;
+      let annotationsByImage = {};
+      let nextAnnId = 1;
+      let mode = 'select'; // 'select' | 'draw'
+      let selectedAnnId = null;
+      let drawStart = null;  // [x, y] on mousedown
+      let drawEnd = null;    // [x, y] on mousemove (preview)
+      const imgEl = document.getElementById('img');
+      const canvasEl = document.getElementById('canvas');
+      const ctx = canvasEl.getContext('2d');
+      const viewerEl = document.getElementById('viewer');
+      const imageIndexEl = document.getElementById('imageIndex');
+      const statusEl = document.getElementById('status');
+      const categoryId = 0;
+
+      function setStatus(msg, isError) {
+        statusEl.textContent = msg;
+        statusEl.className = 'status ' + (isError ? 'error' : 'ok');
+      }
+
+      function buildAnnotationsByImage() {
+        annotationsByImage = {};
+        if (!coco || !coco.annotations) return;
+        coco.annotations.forEach(ann => {
+          if (!annotationsByImage[ann.image_id]) annotationsByImage[ann.image_id] = [];
+          annotationsByImage[ann.image_id].push(ann);
+        });
+        let maxId = 0;
+        coco.annotations.forEach(a => { if (a.id > maxId) maxId = a.id; });
+        nextAnnId = maxId + 1;
+      }
+
+      function getCurrentImage() {
+        return imageList[currentIndex] || null;
+      }
+
+      function getCurrentAnnotations() {
+        const img = getCurrentImage();
+        return (img && annotationsByImage[img.id]) ? annotationsByImage[img.id] : [];
+      }
+
+      function scaleToFit(imgW, imgH, viewW, viewH) {
+        const s = Math.min(viewW / imgW, viewH / imgH, 1);
+        return { scale: s, drawW: imgW * s, drawH: imgH * s };
+      }
+
+      function redraw() {
+        const img = getCurrentImage();
+        if (!img) return;
+        const anns = getCurrentAnnotations();
+        const rect = imgEl.getBoundingClientRect();
+        const imgW = img.width;
+        const imgH = img.height;
+        const viewW = rect.width;
+        const viewH = rect.height;
+        const { scale, drawW, drawH } = scaleToFit(imgW, imgH, viewW, viewH);
+
+        canvasEl.width = drawW;
+        canvasEl.height = drawH;
+        canvasEl.style.width = drawW + 'px';
+        canvasEl.style.height = drawH + 'px';
+
+        ctx.clearRect(0, 0, drawW, drawH);
+        anns.forEach(ann => {
+          const [x, y, w, h] = ann.bbox;
+          const sx = x * scale;
+          const sy = y * scale;
+          const sw = w * scale;
+          const sh = h * scale;
+          ctx.strokeStyle = ann.id === selectedAnnId ? '#00ff00' : '#4CAF50';
+          ctx.lineWidth = ann.id === selectedAnnId ? 3 : 2;
+          ctx.strokeRect(sx, sy, sw, sh);
+          ctx.fillStyle = 'rgba(76, 175, 80, 0.15)';
+          ctx.fillRect(sx, sy, sw, sh);
+        });
+        if (drawStart && drawEnd) {
+          const [x0, y0] = drawStart;
+          const [x1, y1] = drawEnd;
+          const nx = Math.min(x0, x1);
+          const ny = Math.min(y0, y1);
+          const nw = Math.abs(x1 - x0);
+          const nh = Math.abs(y1 - y0);
+          ctx.strokeStyle = '#ff9800';
+          ctx.lineWidth = 2;
+          ctx.setLineDash([4, 4]);
+          ctx.strokeRect(nx * scale, ny * scale, nw * scale, nh * scale);
+          ctx.setLineDash([]);
+        }
+      }
+
+      function loadImage() {
+        const img = getCurrentImage();
+        if (!img) {
+          imgEl.style.display = 'none';
+          imageIndexEl.textContent = '0 / 0';
+          return;
+        }
+        imgEl.style.display = 'block';
+        imgEl.src = '/' + img.file_name;
+        imageIndexEl.textContent = (currentIndex + 1) + ' / ' + imageList.length;
+        selectedAnnId = null;
+        drawStart = null;
+        drawEnd = null;
+      }
+
+      function onImageLoad() {
+        redraw();
+      }
+
+      function getScale() {
+        const img = getCurrentImage();
+        if (!img) return 1;
+        const rect = canvasEl.getBoundingClientRect();
+        return Math.min(rect.width / img.width, rect.height / img.height, 1);
+      }
+      function bboxFromEvent(e) {
+        const img = getCurrentImage();
+        if (!img) return [0, 0];
+        const rect = canvasEl.getBoundingClientRect();
+        const scale = getScale();
+        const x = (e.clientX - rect.left) / scale;
+        const y = (e.clientY - rect.top) / scale;
+        return [x, y];
+      }
+
+      function hitTest(ann, px, py) {
+        const [x, y, w, h] = ann.bbox;
+        return px >= x && px <= x + w && py >= y && py <= y + h;
+      }
+
+      function addAnnotation(imageId, x, y, w, h) {
+        if (w < 2 || h < 2) return;
+        const ann = {
+          id: nextAnnId++,
+          image_id: imageId,
+          category_id: categoryId,
+          bbox: [x, y, w, h],
+          area: w * h,
+          iscrowd: 0
+        };
+        if (!annotationsByImage[imageId]) annotationsByImage[imageId] = [];
+        annotationsByImage[imageId].push(ann);
+        coco.annotations.push(ann);
+        selectedAnnId = ann.id;
+        redraw();
+      }
+
+      function deleteSelected() {
+        if (!selectedAnnId) return;
+        const img = getCurrentImage();
+        if (!img) return;
+        const arr = annotationsByImage[img.id];
+        if (arr) {
+          const i = arr.findIndex(a => a.id === selectedAnnId);
+          if (i !== -1) arr.splice(i, 1);
+        }
+        const gi = coco.annotations.findIndex(a => a.id === selectedAnnId);
+        if (gi !== -1) coco.annotations.splice(gi, 1);
+        selectedAnnId = null;
+        redraw();
+      }
+
+      canvasEl.addEventListener('mousedown', function (e) {
+        const img = getCurrentImage();
+        if (!img) return;
+        const [x, y] = bboxFromEvent(e);
+        const anns = getCurrentAnnotations();
+
+        if (mode === 'draw') {
+          drawStart = [x, y];
+          drawEnd = null;
+          redraw();
+          return;
+        }
+
+        let hit = null;
+        for (let i = anns.length - 1; i >= 0; i--) {
+          if (hitTest(anns[i], x, y)) { hit = anns[i]; break; }
+        }
+        selectedAnnId = hit ? hit.id : null;
+        redraw();
+      });
+
+      canvasEl.addEventListener('mousemove', function (e) {
+        const img = getCurrentImage();
+        if (!img) return;
+        const [x, y] = bboxFromEvent(e);
+
+        if (drawStart && mode === 'draw') {
+          drawEnd = [Math.max(0, Math.min(x, img.width)), Math.max(0, Math.min(y, img.height))];
+          redraw();
+          return;
+        }
+        redraw();
+      });
+
+      canvasEl.addEventListener('mouseup', function (e) {
+        const img = getCurrentImage();
+        if (!img || !drawStart) return;
+        if (mode === 'draw' && drawEnd) {
+          const [x0, y0] = drawStart;
+          const [x1, y1] = drawEnd;
+          const nx = Math.min(x0, x1);
+          const ny = Math.min(y0, y1);
+          const nw = Math.abs(x1 - x0);
+          const nh = Math.abs(y1 - y0);
+          if (nw >= 2 && nh >= 2) addAnnotation(img.id, nx, ny, nw, nh);
+        }
+        drawStart = null;
+        drawEnd = null;
+        redraw();
+      });
+
+      canvasEl.addEventListener('mouseleave', function () {
+        if (drawStart) { drawStart = null; drawEnd = null; }
+        redraw();
+      });
+
+      document.getElementById('btnPrev').addEventListener('click', function () {
+        if (currentIndex > 0) { currentIndex--; loadImage(); onImageLoad(); }
+      });
+      document.getElementById('btnNext').addEventListener('click', function () {
+        if (currentIndex < imageList.length - 1) { currentIndex++; loadImage(); onImageLoad(); }
+      });
+      document.getElementById('btnAdd').addEventListener('click', function () {
+        mode = mode === 'draw' ? 'select' : 'draw';
+        this.textContent = mode === 'draw' ? 'Cancel' : 'Add box';
+      });
+      document.getElementById('btnDelete').addEventListener('click', deleteSelected);
+      document.getElementById('btnSave').addEventListener('click', function () {
+        fetch(SAVE_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(coco)
+        })
+          .then(r => r.json())
+          .then(data => setStatus(data.success ? 'Saved.' : data.error || 'Error', !data.success))
+          .catch(err => setStatus('Error: ' + err.message, true));
+      });
+
+      document.addEventListener('keydown', function (e) {
+        if (e.key === 'Delete' || e.key === 'Backspace') { e.preventDefault(); deleteSelected(); }
+        if (e.key === 'ArrowLeft') { document.getElementById('btnPrev').click(); }
+        if (e.key === 'ArrowRight') { document.getElementById('btnNext').click(); }
+      });
+
+      imgEl.addEventListener('load', onImageLoad);
+
+      fetch(COCO_URL)
+        .then(r => r.json())
+        .then(data => {
+          coco = data;
+          imageList = (coco.images || []).slice();
+          buildAnnotationsByImage();
+          currentIndex = 0;
+          loadImage();
+          onImageLoad();
+          setStatus('Loaded ' + imageList.length + ' images, ' + (coco.annotations || []).length + ' annotations.');
+        })
+        .catch(err => setStatus('Failed to load annotations: ' + err.message, true));
+    })();
+  </script>
+</body>
+</html>

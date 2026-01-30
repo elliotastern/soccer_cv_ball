@@ -11,7 +11,7 @@ model:
 
 # Detection Settings
 detection:
-  confidence_threshold: 0.10  # Optimized for 45% recall, 100% precision (Epoch 89)
+  confidence_threshold: 0.5  # Minimum confidence for detections
 
 # Tracker Settings (ByteTrack)
 tracker:
